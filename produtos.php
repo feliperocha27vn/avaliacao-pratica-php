@@ -1,6 +1,7 @@
 <?php
+require "models/consultas.php";
+
 if (!empty($_GET['id'])) {
-    include_once './conexao.php';
 
     $id = $_GET['id'];
 
@@ -9,7 +10,7 @@ if (!empty($_GET['id'])) {
     $pagina_atual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
     $inicio = ($pagina_atual - 1) * $itens_por_pagina;
 
-    //requisicao da ordem 
+    // requisicao da ordem 
     $coluna = isset($_GET['coluna']) ? $_GET['coluna'] : 'PRODUTO';
     $ordem = isset($_GET['ordem']) ? $_GET['ordem'] : 'ASC';
 
@@ -25,7 +26,6 @@ if (!empty($_GET['id'])) {
         $ordem = 'ASC';
     }
 
-    
     $sqlCount = "SELECT COUNT(*) as total 
                  FROM produto, empresa 
                  WHERE produto.EMPRESA = empresa.EMPRESA 
@@ -35,7 +35,6 @@ if (!empty($_GET['id'])) {
     $total_registros = $resultCount->fetch_assoc()['total'];
     $total_paginas = ceil($total_registros / $itens_por_pagina);
 
-    
     $sqlSelect = "SELECT empresa.RAZAO_SOCIAL, produto.DESCRICAO_PRODUTO, produto.PRODUTO, grupo_produto.DESCRICAO_GRUPO_PRODUTO 
                   FROM produto, empresa, grupo_produto 
                   WHERE produto.EMPRESA = empresa.EMPRESA
@@ -72,6 +71,28 @@ if (!empty($_GET['id'])) {
         <a href='index.php'>
             <button type="button" class="btn btn-primary mb-2">Página Principal</button>
         </a>
+        <div class="flex justify-center mb-5">
+            <form class="w-2/6 flex gap-x-2">
+                <input type="text" class="form-control" name="pesquisar" placeholder="Pesquisar">
+                <button type="submit" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-search">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                </button>
+                <!-- adicionar -->
+                <a href="adicionar.php?id=<?php echo $id; ?>" type="button" class="btn btn-success flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-plus">
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                    </svg>
+                </a>
+            </form>
+        </div>
         <h2 class="mb-4 text-center"><?php echo $razaoSocial; ?></h2>
         <table class="table table-hover text-center align-middle">
             <thead>
@@ -89,6 +110,10 @@ if (!empty($_GET['id'])) {
                             href="?id=<?php echo $id; ?>&coluna=DESCRICAO_GRUPO_PRODUTO&ordem=<?php echo $proximaOrdem; ?>">Grupo
                             Produto</a>
                     </th>
+                    <th scope="col">
+                        <a href="">
+                            Opções</a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -102,6 +127,28 @@ if (!empty($_GET['id'])) {
                         <td><?php echo $idProduto ?></td>
                         <td><?php echo $descricaoProduto ?></td>
                         <td><?php echo $grupoProduto ?></td>
+                        <td>
+                            <!-- editar -->
+                            <a href="editar.php?idProduto=<?php echo $idProduto; ?>&idEmpresa=<?php echo $id; ?>">
+                                <button type="button" class="btn btn-warning">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-pen">
+                                        <path
+                                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                    </svg>
+                                </button>
+                            </a>
+                            <!-- remover -->
+                            <button type="button" class="btn btn-danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-x">
+                                    <path d="M18 6 6 18" />
+                                    <path d="m6 6 12 12" />
+                                </svg>
+                            </button>
+                        </td>
                     </tr>
                     <?php
                 }
@@ -122,7 +169,7 @@ if (!empty($_GET['id'])) {
                 <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
                     <li class="page-item <?php echo ($i == $pagina_atual) ? 'active' : ''; ?>">
                         <a class="page-link"
-                            href="?id=<?php echo $id; ?>&pagina=<?php echo $i; ?>&coluna=<?php echo $coluna; ?>&ordem=<?php echo $ordem; ?>"><?php echo $i; ?></a>
+                            href="? id=<?php echo $id; ?>&pagina=<?php echo $i; ?>&coluna=<?php echo $coluna; ?>&ordem=<?php echo $ordem; ?>"><?php echo $i; ?></a>
                     </li>
                 <?php endfor; ?>
 
